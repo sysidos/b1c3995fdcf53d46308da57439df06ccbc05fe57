@@ -1,0 +1,107 @@
+//===--- TypeNodes.def - Swift Type AST Metaprogramming ---------*- C++ -*-===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2015 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See http://swift.org/LICENSE.txt for license information
+// See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines macros used for macro-metaprogramming with types.
+//
+//===----------------------------------------------------------------------===//
+
+/// TYPE(id, parent)
+///   If the type node is not abstract, its enumerator value is
+///   TypeKind::id.  The node's class name is 'id##Type', and the name of
+///   its base class (in the Type hierarchy) is 'parent' (including
+///   the 'Type' suffix).
+
+/// ALWAYS_CANONICAL_TYPE(id, parent)
+///   This type is always canonical.  The default behavior is TYPE(id, parent).
+
+/// SUGARED_TYPE(id, parent)
+///   This type is never canonical.  It provides an efficient accessor,
+///   getDesugaredType(), which removes one level of sugar.  This process
+///   does not necessarily converge to the canonical type, however.
+///   The default behavior is TYPE(id, parent).
+
+/// UNCHECKED_TYPE(id, parent)
+///   This type is not present in valid, type-checked programs.
+///   The default behavior is TYPE(id, parent).
+
+#ifndef ALWAYS_CANONICAL_TYPE
+#define ALWAYS_CANONICAL_TYPE(id, parent) TYPE(id, parent)
+#endif
+
+/// Most metaprograms do not care about abstract types, so the default
+/// is to ignore them.
+#ifndef ABSTRACT_TYPE
+#define ABSTRACT_TYPE(Id, Parent)
+#endif
+
+#ifndef SUGARED_TYPE
+#define SUGARED_TYPE(id, parent) TYPE(id, parent)
+#endif
+
+#ifndef UNCHECKED_TYPE
+#define UNCHECKED_TYPE(id, parent) TYPE(id, parent)
+#endif
+
+/// A convenience for determining the range of types.  These will always
+/// appear immediately after the last member.
+#ifndef TYPE_RANGE
+#define TYPE_RANGE(Id, First, Last)
+#endif
+
+UNCHECKED_TYPE(Error, Type)
+ABSTRACT_TYPE(Builtin, Type)
+  ALWAYS_CANONICAL_TYPE(BuiltinInteger, BuiltinType)
+  ALWAYS_CANONICAL_TYPE(BuiltinFloat, BuiltinType)
+  ALWAYS_CANONICAL_TYPE(BuiltinRawPointer, BuiltinType)
+  ALWAYS_CANONICAL_TYPE(BuiltinObjectPointer, BuiltinType)
+  ALWAYS_CANONICAL_TYPE(BuiltinObjCPointer, BuiltinType)
+  TYPE_RANGE(Builtin, BuiltinInteger, BuiltinObjCPointer)
+UNCHECKED_TYPE(UnstructuredUnresolved, Type)
+SUGARED_TYPE(NameAlias, Type)
+SUGARED_TYPE(Identifier, Type)
+SUGARED_TYPE(Paren, Type)
+TYPE(Tuple, Type)
+ABSTRACT_TYPE(Nominal, Type)
+  TYPE(OneOf, NominalType)
+  TYPE(Struct, NominalType)
+  TYPE(Class, NominalType)
+  ALWAYS_CANONICAL_TYPE(Protocol, NominalType)
+  TYPE_RANGE(Nominal, OneOf, Protocol)
+TYPE(MetaType, Type)
+ALWAYS_CANONICAL_TYPE(Module, Type)
+ABSTRACT_TYPE(Substitutable, Type)
+  ALWAYS_CANONICAL_TYPE(Archetype, SubstitutableType)
+  ALWAYS_CANONICAL_TYPE(DeducibleGenericParam, SubstitutableType)
+  TYPE_RANGE(Substitutable, Archetype, DeducibleGenericParam)
+SUGARED_TYPE(Substituted, Type)
+ABSTRACT_TYPE(AnyFunction, Type)
+  TYPE(Function, AnyFunctionType)
+  TYPE(PolymorphicFunction, AnyFunctionType)
+  TYPE_RANGE(AnyFunction, Function, PolymorphicFunction)
+TYPE(Array, Type)
+SUGARED_TYPE(ArraySlice, Type)
+TYPE(ProtocolComposition, Type)
+TYPE(LValue, Type)
+TYPE(UnboundGeneric, Type)
+ABSTRACT_TYPE(BoundGeneric, Type)
+  TYPE(BoundGenericClass, BoundGenericType)
+  TYPE(BoundGenericOneOf, BoundGenericType)
+  TYPE(BoundGenericStruct, BoundGenericType)
+  TYPE_RANGE(BoundGeneric, BoundGenericClass, BoundGenericStruct)
+UNCHECKED_TYPE(TypeVariable, Type)
+
+#undef TYPE_RANGE
+#undef UNCHECKED_TYPE
+#undef SUGARED_TYPE
+#undef ABSTRACT_TYPE
+#undef ALWAYS_CANONICAL_TYPE
+#undef TYPE

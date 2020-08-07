@@ -1,0 +1,97 @@
+//===--- SILNodes.def - Swift SIL Metaprogramming ---------------*- C++ -*-===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2015 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See http://swift.org/LICENSE.txt for license information
+// See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines macros used for macro-metaprogramming with SIL nodes.
+//
+//===----------------------------------------------------------------------===//
+
+/// VALUE(Id, Parent)
+///   The expression enumerator value is an ValueKind.  The node's class name is
+///   Id, and the name of its base class (in the Value hierarchy) is Parent.
+#ifndef VALUE
+#define VALUE(Id, Parent)
+#endif
+
+/// INST(Id, Parent)
+///   The expression enumerator value is an ValueKind.  The node's class name is
+///   Id, and the name of its base class (in the Instruction hierarchy) is
+///   Parent.
+#ifndef INST
+#define INST(Id, Parent) VALUE(Id, Parent)
+#endif
+
+/// An abstract instruction is an abstract base class in the hierarchy;
+/// it is never a most-derived type, and it does not have an enumerator in
+/// ValueKind.
+///
+/// Most metaprograms do not care about abstract expressions, so the default
+/// is to ignore them.
+#ifndef ABSTRACT_VALUE
+#define ABSTRACT_VALUE(Id, Parent)
+#endif
+
+/// A convenience for determining the range of values.  These will always
+/// appear immediately after the last member.
+#ifndef VALUE_RANGE
+#define VALUE_RANGE(Id, First, Last)
+#endif
+
+VALUE(BBArgument, Value)
+
+ABSTRACT_VALUE(Instruction, Value)
+  ABSTRACT_VALUE(AllocInst, Instruction)
+    INST(AllocVarInst, AllocInst)
+    INST(AllocTmpInst, AllocInst)
+    VALUE_RANGE(AllocInst, AllocVarInst, AllocTmpInst)
+  INST(AllocArrayInst, Instruction)
+  INST(ApplyInst, Instruction)
+  INST(ConstantRefInst, Instruction)
+
+  // Literals
+  INST(ZeroValueInst, Instruction)
+  INST(IntegerLiteralInst, Instruction)
+  INST(FloatLiteralInst, Instruction)
+  INST(CharacterLiteralInst, Instruction)
+  INST(StringLiteralInst, Instruction)
+
+  INST(LoadInst, Instruction)
+  INST(StoreInst, Instruction)
+  INST(CopyInst, Instruction)
+  INST(SpecializeInst, Instruction)
+  INST(TypeConversionInst, Instruction)
+  INST(TupleInst, Instruction)
+  INST(MetatypeInst, Instruction)
+  INST(TupleElementInst, Instruction)
+  
+  INST(RetainInst, Instruction)
+  INST(ReleaseInst, Instruction)
+  INST(DeallocInst, Instruction)
+  INST(DestroyInst, Instruction)
+
+  // SIL-only instructions that don't have an AST analog.
+  INST(IndexLValueInst, Instruction)
+  INST(IntegerValueInst, Instruction)
+
+  // Terminators.
+  ABSTRACT_VALUE(TermInst, Instruction)
+    INST(UnreachableInst, TermInst)
+    INST(ReturnInst, TermInst)
+    INST(BranchInst, TermInst)
+    INST(CondBranchInst, TermInst)
+    VALUE_RANGE(TermInst, UnreachableInst, CondBranchInst)
+
+  VALUE_RANGE(Instruction, AllocVarInst, CondBranchInst)
+
+#undef VALUE_RANGE
+#undef ABSTRACT_VALUE
+#undef INST
+#undef VALUE

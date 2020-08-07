@@ -1,0 +1,119 @@
+//===--- ExprNodes.def - Swift Expression AST Metaprogramming ---*- C++ -*-===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2015 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See http://swift.org/LICENSE.txt for license information
+// See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines macros used for macro-metaprogramming with expressions.
+//
+//===----------------------------------------------------------------------===//
+
+/// EXPR(Id, Parent)
+///   If the expression node is not abstract, its enumerator value is
+///   ExprKind::Id.  The node's class name is Id##Expr, and the name of
+///   its base class (in the Expr hierarchy) is Parent.
+#ifndef EXPR
+#define EXPR(Id, Parent)
+#endif
+
+/// An abstract expression node is an abstract base class in the hierarchy;
+/// it is never a most-derived type, and it does not have an enumerator in
+/// ExprKind.
+///
+/// Most metaprograms do not care about abstract expressions, so the default
+/// is to ignore them.
+#ifndef ABSTRACT_EXPR
+#define ABSTRACT_EXPR(Id, Parent)
+#endif
+
+/// An "unchecked" expression node is removed from valid code by the end
+/// of the type-checking phase.
+///
+/// By default, these are treated like any other expression.
+#ifndef UNCHECKED_EXPR
+#define UNCHECKED_EXPR(Id, Parent) EXPR(Id, Parent)
+#endif
+
+/// A convenience for determining the range of expressions.  These will always
+/// appear immediately after the last member.
+#ifndef EXPR_RANGE
+#define EXPR_RANGE(Id, First, Last)
+#endif
+
+EXPR(Error, Expr)
+ABSTRACT_EXPR(Literal, Expr)
+  EXPR(IntegerLiteral, LiteralExpr)
+  EXPR(FloatLiteral, LiteralExpr)
+  EXPR(CharacterLiteral, LiteralExpr)
+  EXPR(StringLiteral, LiteralExpr)
+  EXPR(InterpolatedStringLiteral, LiteralExpr)
+  EXPR_RANGE(Literal, IntegerLiteral, InterpolatedStringLiteral)
+EXPR(DeclRef, Expr)
+EXPR(DotSyntaxBaseIgnored, Expr)
+ABSTRACT_EXPR(OverloadSetRef, Expr)
+  UNCHECKED_EXPR(OverloadedDeclRef, OverloadSetRefExpr)
+  UNCHECKED_EXPR(OverloadedMemberRef, OverloadSetRefExpr)
+  EXPR_RANGE(OverloadSetRef, OverloadedDeclRef, OverloadedMemberRef)
+UNCHECKED_EXPR(UnresolvedDeclRef, Expr)
+EXPR(MemberRef, Expr)
+EXPR(ExistentialMemberRef, Expr)
+EXPR(ArchetypeMemberRef, Expr)
+EXPR(GenericMemberRef, Expr)
+UNCHECKED_EXPR(UnresolvedMember, Expr)
+UNCHECKED_EXPR(UnresolvedDot, Expr)
+UNCHECKED_EXPR(Sequence, Expr)
+EXPR(Paren, Expr)
+EXPR(Tuple, Expr)
+EXPR(Subscript, Expr)
+UNCHECKED_EXPR(OverloadedSubscript, Expr)
+EXPR(ExistentialSubscript, Expr)
+EXPR(ArchetypeSubscript, Expr)
+EXPR(GenericSubscript, Expr)
+EXPR(TupleElement, Expr)
+ABSTRACT_EXPR(Capturing, Expr)
+  EXPR(Func, CapturingExpr)
+  ABSTRACT_EXPR(Closure, CapturingExpr)
+    EXPR(ExplicitClosure, ClosureExpr)
+    EXPR(ImplicitClosure, ClosureExpr)
+  EXPR_RANGE(Capturing, Func, ImplicitClosure)
+EXPR(Module, Expr)
+EXPR(AddressOf, Expr)
+EXPR(NewArray, Expr)
+EXPR(Metatype, Expr)
+UNCHECKED_EXPR(OpaqueValue, Expr)
+ABSTRACT_EXPR(Apply, Expr)
+  EXPR(Call, ApplyExpr)
+  EXPR(PrefixUnary, ApplyExpr)
+  EXPR(PostfixUnary, ApplyExpr)
+  EXPR(Binary, ApplyExpr)
+  EXPR(NewReference, ApplyExpr)
+  ABSTRACT_EXPR(ThisApply, ApplyExpr)
+    EXPR(DotSyntaxCall, ThisApplyExpr)
+    EXPR(ConstructorRefCall, ThisApplyExpr)
+    EXPR_RANGE(ThisApply, DotSyntaxCall, ConstructorRefCall)
+  EXPR_RANGE(Apply, Call, ConstructorRefCall)
+ABSTRACT_EXPR(ImplicitConversion, Expr)
+  EXPR(Load, ImplicitConversionExpr)
+  EXPR(Materialize, ImplicitConversionExpr)
+  EXPR(Requalify, ImplicitConversionExpr)
+  EXPR(TupleShuffle, ImplicitConversionExpr)
+  EXPR(FunctionConversion, ImplicitConversionExpr)
+  EXPR(MetatypeConversion, ImplicitConversionExpr)
+  EXPR(Erasure, ImplicitConversionExpr)
+  EXPR(Specialize, ImplicitConversionExpr)
+  EXPR(GetMetatype, ImplicitConversionExpr)
+  EXPR(DerivedToBase, ImplicitConversionExpr)
+  EXPR(ScalarToTuple, ImplicitConversionExpr)
+  EXPR_RANGE(ImplicitConversion, Load, ScalarToTuple)
+EXPR(Coerce, Expr)
+
+#undef EXPR_RANGE
+#undef UNCHECKED_EXPR
+#undef ABSTRACT_EXPR
+#undef EXPR

@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+
+import json
+import optparse
+import subprocess
+import time
+
+def send_to_screen(screen_name, arg0=None, command='stuff'):
+    args = ['screen', '-S', screen_name, '-p', '0',
+            '-X', command]
+    if arg0 is not None:
+        args.append(arg0)
+    p = subprocess.Popen(args)
+    p.communicate()
+
+def load_as_transcript(f):
+    def add_block():
+        # If so, add the current block after trimming leading and trailing blank
+        # lines.
+        while current_block and current_block[0].isspace():
+            current_block.pop(0)
+        while current_block and current_block[-1].isspace():
+            current_block.pop()
+
+        # Add the block if it is non-empty.
+        if current_block:
+            # Form the joined script..
+            script = ''.join(current_block)
+
+            # Strip off any trailing newline.
+            if script.endswith('\n'):
+                script = script[:-1]
+            demo_script.append({ 'command' :  script})
+
+            # Clear the block.
+            del current_block[:]
+
+    f.seek(0)
+
+    demo_script = []
+    current_block = []
+    for ln in f:
+        # Check if this is a block delimiter.
+        if ln.strip() == '>>>':
+            add_block()
+            continue
+
+        # Otherwise, add the line to the current block.
+        current_block.append(ln)
+
+    return demo_script
+
+def main():
+    parser = optparse.OptionParser("""\
+usage: %%prog [options] <demo script>
+
+Run a command line demo script using 'screen'. The script file should be either
+a JSON document listing the commands to run, as in::
+
+  [
+    { "command" : "ls" },
+    { "command" : "echo Hello" }
+  ]
+
+or, alternately, it should be a text filed delimited by '>>>', as in::
+
+  >>>
+  ls
+
+  >>>
+  echo Hello
+
+where leading and trailing blank lines around each block will be discarded.
+
+The script requires the 'screen' session to have been started in another window,
+for example::
+
+  $ screen -S demo
+""")
+
+    def send(*args, **kwargs):
+        return send_to_screen(opts.screen_name, *args, **kwargs)
+    parser.add_option("-S", "--screen-name", dest="screen_name", metavar="NAME",
+                      help="name of the screen sesison to use [%default]",
+                      action="store", default="demo")
+
+    opts, args = parser.parse_args()
+
+    if len(args) == 1:
+        path, = args
+    else:
+        parser.error("invalid number of arguments")
+
+    # Read in the demo script.
+    with open(path) as f:
+        try:
+            demo_script = json.load(f)
+        except ValueError:
+            demo_script = load_as_transcript(f)
+        
+    # Validate the entries.
+    for item in demo_script:
+        command = str(item.get('command'))
+        if not isinstance(command, str):
+            raise SystemError("error: invalid item in script: %r" % (
+                    item,))
+
+    # Notify screen that we are starting the demo.
+    raw_input('press enter to begin demo...')
+
+    # Iterate over each command, sending it and waiting for user direction to
+    # continue.
+    for item in demo_script:
+        command = str(item['command'])
+
+        # Send the command slowly, as if it was typed.
+        print "sending command: %r" % (command.replace('\n', '<cr>'),)
+        for c in command:
+            send(c)
+            time.sleep(0.01)
+
+        # Wait for user input, then send a return.
+        raw_input('press enter to send return...')
+        send('\n')
+        if item is not demo_script[-1]:
+            raw_input('press enter to continue to next command...')
+
+    # Notify screen that the demo is over, after a small wait period.
+    time.sleep(0.1)
+    send('Demo session is over.', command='wall')
+
+if __name__ == '__main__':
+    main()

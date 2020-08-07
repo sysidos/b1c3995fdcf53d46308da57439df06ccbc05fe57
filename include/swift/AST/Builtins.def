@@ -1,0 +1,184 @@
+//===--- Builtins.def - Builtins Macro Metaprogramming Database -*- C++ -*-===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2015 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See http://swift.org/LICENSE.txt for license information
+// See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the database of builtin functions.
+//
+// BUILTIN(Id, Name)
+//   - Id is an identifier suitable for use in C++
+//   - Name is a string literal for the name to which the builtin should be
+//     bound in Swift
+//
+//===----------------------------------------------------------------------===//
+
+/// Cast operations have type T1 -> T2.
+#ifndef BUILTIN_CAST_OPERATION
+#define BUILTIN_CAST_OPERATION(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_CAST_OPERATION(Trunc   , "trunc")
+BUILTIN_CAST_OPERATION(ZExt    , "zext")
+BUILTIN_CAST_OPERATION(SExt    , "sext")
+BUILTIN_CAST_OPERATION(FPToUI  , "fptoui")
+BUILTIN_CAST_OPERATION(FPToSI  , "fptosi")
+BUILTIN_CAST_OPERATION(UIToFP  , "uitofp")
+BUILTIN_CAST_OPERATION(SIToFP  , "sitofp")
+BUILTIN_CAST_OPERATION(FPTrunc , "fptrunc")
+BUILTIN_CAST_OPERATION(FPExt   , "fpext")
+BUILTIN_CAST_OPERATION(PtrToInt, "ptrtoint")
+BUILTIN_CAST_OPERATION(IntToPtr, "inttoptr")
+BUILTIN_CAST_OPERATION(BitCast , "bitcast")
+
+#undef BUILTIN_CAST_OPERATION
+
+/// Binary operations have type (T,T) -> T.
+#ifndef BUILTIN_BINARY_OPERATION
+#define BUILTIN_BINARY_OPERATION(Id, Name, Overload) BUILTIN(Id, Name)
+#endif
+BUILTIN_BINARY_OPERATION(Add,     "add",      OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(FAdd,    "fadd",     OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_OPERATION(And,     "and",      OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(AShr,    "ashr",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(LShr,    "lshr",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(Or,      "or",       OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(FDiv,    "fdiv",     OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_OPERATION(Mul,     "mul",      OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(FMul,    "fmul",     OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_OPERATION(SDiv,    "sdiv",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(ExactSDiv, "sdiv_exact", OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(Shl,     "shl",      OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(SRem,    "srem",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(Sub,     "sub",      OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(FSub,    "fsub",     OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_OPERATION(UDiv,    "udiv",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(ExactUDiv, "udiv_exact", OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(URem,    "urem",     OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_OPERATION(Xor,     "xor",      OverloadedBuiltinKind::Integer)
+#undef BUILTIN_BINARY_OPERATION
+
+/// Binary predicates have type (T,T) -> i1
+#ifndef BUILTIN_BINARY_PREDICATE
+#define BUILTIN_BINARY_PREDICATE(Id, Name, Overload) BUILTIN(Id, Name)
+#endif
+BUILTIN_BINARY_PREDICATE(ICMP_EQ,  "cmp_eq",   OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(ICMP_NE,  "cmp_ne",   OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(ICMP_SLE, "cmp_sle",  OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_PREDICATE(ICMP_SLT, "cmp_slt",  OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_PREDICATE(ICMP_SGE, "cmp_sge",  OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_PREDICATE(ICMP_SGT, "cmp_sgt",  OverloadedBuiltinKind::Integer)
+BUILTIN_BINARY_PREDICATE(ICMP_ULE, "cmp_ule",  OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(ICMP_ULT, "cmp_ult",  OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(ICMP_UGE, "cmp_uge",  OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(ICMP_UGT, "cmp_ugt",  OverloadedBuiltinKind::IntegerOrRawPointer)
+BUILTIN_BINARY_PREDICATE(FCMP_OEQ, "fcmp_oeq", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_OGT, "fcmp_ogt", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_OGE, "fcmp_oge", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_OLT, "fcmp_olt", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_OLE, "fcmp_ole", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_ONE, "fcmp_one", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_ORD, "fcmp_ord", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_UEQ, "fcmp_ueq", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_UGT, "fcmp_ugt", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_UGE, "fcmp_uge", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_ULT, "fcmp_ult", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_ULE, "fcmp_ule", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_UNE, "fcmp_une", OverloadedBuiltinKind::Float)
+BUILTIN_BINARY_PREDICATE(FCMP_UNO, "fcmp_uno", OverloadedBuiltinKind::Float)
+#undef BUILTIN_BINARY_PREDICATE
+
+
+/// GetElementPtr has type (Builtin.RawPointer, T) -> Builtin.RawPointer
+#ifndef BUILTIN_GEP_OPERATION
+#define BUILTIN_GEP_OPERATION(Id, Name, Overload) BUILTIN(Id, Name)
+#endif
+                       
+BUILTIN_GEP_OPERATION(Gep, "gep", OverloadedBuiltinKind::Integer)
+#undef BUILTIN_GEP_OPERATION
+
+/// Load has type (Builtin.RawPointer) -> T
+#ifndef BUILTIN_LOAD
+#define BUILTIN_LOAD(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_LOAD(Load, "load")
+BUILTIN_LOAD(Move, "move")
+#undef BUILTIN_LOAD
+
+/// Destroy has type (metatype<T>, Builtin.RawPointer) -> ()
+#ifndef BUILTIN_DESTROY
+#define BUILTIN_DESTROY(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_DESTROY(Destroy, "destroy")
+#undef BUILTIN_DESTROY
+
+/// Assign has type (T, Builtin.RawPointer) -> ()
+#ifndef BUILTIN_ASSIGN
+#define BUILTIN_ASSIGN(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_ASSIGN(Assign, "assign")
+#undef BUILTIN_ASSIGN
+
+/// Init has type (T, Builtin.RawPointer) -> ()
+#ifndef BUILTIN_INIT
+#define BUILTIN_INIT(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_INIT(Init, "init")
+#undef BUILTIN_INIT
+
+/// Sizeof has type (metatype<T>) -> Int64
+#ifndef BUILTIN_SIZEOF
+#define BUILTIN_SIZEOF(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_SIZEOF(Sizeof, "sizeof")
+#undef BUILTIN_SIZEOF
+
+/// Strideof has type (metatype<T>) -> Int64
+#ifndef BUILTIN_STRIDEOF
+#define BUILTIN_STRIDEOF(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_STRIDEOF(Strideof, "strideof")
+#undef BUILTIN_STRIDEOF
+
+/// Alignof has type (metatype<T>) -> Int64
+#ifndef BUILTIN_ALIGNOF
+#define BUILTIN_ALIGNOF(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_ALIGNOF(Alignof, "alignof")
+#undef BUILTIN_ALIGNOF
+
+/// AllocRaw has type (Int64, Int64) -> Builtin.RawPointer
+#ifndef BUILTIN_ALLOCRAW
+#define BUILTIN_ALLOCRAW(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_ALLOCRAW(AllocRaw, "allocRaw")
+#undef BUILTIN_ALLOCRAW
+
+/// DeallocRaw has type (Builtin.RawPointer, Int64) -> ()
+#ifndef BUILTIN_DEALLOCRAW
+#define BUILTIN_DEALLOCRAW(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_DEALLOCRAW(DeallocRaw, "deallocRaw")
+#undef BUILTIN_DEALLOCRAW
+
+/// CastToObjectPointer has type (T) -> Builtin.ObjectPointer.
+/// CastFromObjectPointer has type (Builtin.ObjectPointer) -> T.
+/// BridgeToRawPointer has type (T) -> Builtin.RawPointer.
+/// BridgeFromRawPointer (Builtin.RawPointer) -> T.
+/// IRGen requires that T is a single retainable pointer.
+/// Bridging to/from a raw pointer does not imply a retain.
+#ifndef BUILTIN_CASTOBJECTPOINTER
+#define BUILTIN_CASTOBJECTPOINTER(Id, Name) BUILTIN(Id, Name)
+#endif
+BUILTIN_CASTOBJECTPOINTER(CastToObjectPointer, "castToObjectPointer")
+BUILTIN_CASTOBJECTPOINTER(CastFromObjectPointer, "castFromObjectPointer")
+BUILTIN_CASTOBJECTPOINTER(BridgeToRawPointer, "bridgeToRawPointer")
+BUILTIN_CASTOBJECTPOINTER(BridgeFromRawPointer, "bridgeFromRawPointer")
+#undef BUILTIN_CASTOBJECTPOINTER
+
+#undef BUILTIN

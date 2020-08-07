@@ -1,0 +1,28 @@
+add_swift_library(swiftIRGen
+  GenArray.cpp
+  GenClass.cpp
+  GenClosure.cpp
+  GenConstructor.cpp
+  GenControl.cpp
+  GenDecl.cpp
+  GenExpr.cpp
+  GenFunc.cpp
+  GenHeap.cpp
+  GenInit.cpp
+  GenLValue.cpp
+  GenMeta.cpp
+  GenObjC.cpp
+  GenOneOf.cpp
+  GenPoly.cpp
+  GenProto.cpp
+  GenStmt.cpp
+  GenStruct.cpp
+  GenTuple.cpp
+  GenType.cpp
+  IRGen.cpp
+  IRGenFunction.cpp
+  IRGenModule.cpp
+  Mangle.cpp
+  OptimizeARC.cpp
+  StructLayout.cpp
+  DEPENDS swiftAST)
